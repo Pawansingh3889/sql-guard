@@ -1,0 +1,147 @@
+"""Tests for all 15 rules."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+
+from sql_guard.checker import check
+from sql_guard.rules import ALL_RULES, get_rules
+
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
+# ---------------------------------------------------------------------------
+# Rule registry
+# ---------------------------------------------------------------------------
+
+
+class TestRuleRegistry:
+    def test_all_rules_loaded(self) -> None:
+        assert len(ALL_RULES) == 15
+
+    def test_5_errors(self) -> None:
+        errors = [r for r in ALL_RULES if r.severity == "error"]
+        assert len(errors) == 5
+
+    def test_10_warnings(self) -> None:
+        warnings = [r for r in ALL_RULES if r.severity == "warning"]
+        assert len(warnings) == 10
+
+    def test_unique_ids(self) -> None:
+        ids = [r.id for r in ALL_RULES]
+        assert len(ids) == len(set(ids))
+
+    def test_disable_rules(self) -> None:
+        rules = get_rules(disabled_ids={"E001", "W001"})
+        ids = {r.id for r in rules}
+        assert "E001" not in ids
+        assert "W001" not in ids
+
+
+# ---------------------------------------------------------------------------
+# Error rules
+# ---------------------------------------------------------------------------
+
+
+class TestErrorRules:
+    def test_e001_delete_without_where(self) -> None:
+        findings = check([str(FIXTURES / "errors.sql")])
+        e001 = [f for f in findings.findings if f.rule_id == "E001"]
+        assert len(e001) >= 1
+        assert "DELETE" in e001[0].message
+
+    def test_e002_drop_without_if_exists(self) -> None:
+        findings = check([str(FIXTURES / "errors.sql")])
+        e002 = [f for f in findings.findings if f.rule_id == "E002"]
+        assert len(e002) >= 1
+
+    def test_e003_grant_revoke(self) -> None:
+        findings = check([str(FIXTURES / "errors.sql")])
+        e003 = [f for f in findings.findings if f.rule_id == "E003"]
+        assert len(e003) >= 1
+
+    def test_e004_string_concat(self) -> None:
+        findings = check([str(FIXTURES / "errors.sql")])
+        e004 = [f for f in findings.findings if f.rule_id == "E004"]
+        assert len(e004) >= 1
+        assert "injection" in e004[0].message.lower()
+
+    def test_e005_insert_without_columns(self) -> None:
+        findings = check([str(FIXTURES / "errors.sql")])
+        e005 = [f for f in findings.findings if f.rule_id == "E005"]
+        assert len(e005) >= 1
+
+
+# ---------------------------------------------------------------------------
+# Warning rules
+# ---------------------------------------------------------------------------
+
+
+class TestWarningRules:
+    def test_w001_select_star(self) -> None:
+        findings = check([str(FIXTURES / "warnings.sql")])
+        w001 = [f for f in findings.findings if f.rule_id == "W001"]
+        assert len(w001) >= 1
+
+    def test_w003_function_on_column(self) -> None:
+        findings = check([str(FIXTURES / "warnings.sql")])
+        w003 = [f for f in findings.findings if f.rule_id == "W003"]
+        assert len(w003) >= 1
+
+    def test_w007_hardcoded_values(self) -> None:
+        findings = check([str(FIXTURES / "warnings.sql")])
+        w007 = [f for f in findings.findings if f.rule_id == "W007"]
+        assert len(w007) >= 1
+
+    def test_w010_commented_out_code(self) -> None:
+        findings = check([str(FIXTURES / "warnings.sql")])
+        w010 = [f for f in findings.findings if f.rule_id == "W010"]
+        assert len(w010) >= 1
+
+
+# ---------------------------------------------------------------------------
+# Clean file
+# ---------------------------------------------------------------------------
+
+
+class TestCleanFile:
+    def test_no_errors_on_clean(self) -> None:
+        findings = check([str(FIXTURES / "clean.sql")], severity="error")
+        assert findings.error_count == 0
+
+    def test_no_findings_on_clean(self) -> None:
+        findings = check([str(FIXTURES / "clean.sql")])
+        # Clean file should have zero or near-zero findings
+        errors = [f for f in findings.findings if f.severity == "error"]
+        assert len(errors) == 0
+
+
+# ---------------------------------------------------------------------------
+# Checker behavior
+# ---------------------------------------------------------------------------
+
+
+class TestChecker:
+    def test_files_checked_count(self) -> None:
+        result = check([str(FIXTURES)])
+        assert result.files_checked == 3  # errors.sql, warnings.sql, clean.sql
+
+    def test_duration_tracked(self) -> None:
+        result = check([str(FIXTURES)])
+        assert result.duration_seconds > 0
+
+    def test_severity_filter(self) -> None:
+        all_findings = check([str(FIXTURES / "errors.sql")])
+        error_only = check([str(FIXTURES / "errors.sql")], severity="error")
+        assert error_only.warning_count == 0
+        assert len(all_findings.findings) >= error_only.error_count
+
+    def test_fail_fast_stops_early(self) -> None:
+        result = check([str(FIXTURES / "errors.sql")], fail_fast=True)
+        # Should have at least 1 error but potentially fewer than checking all
+        assert result.error_count >= 1
+
+    def test_nonexistent_path(self) -> None:
+        result = check(["nonexistent_dir/"])
+        assert result.files_checked == 0

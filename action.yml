@@ -1,0 +1,31 @@
+name: 'sql-guard'
+description: 'Fast rule-based SQL linter for pull requests'
+inputs:
+  paths:
+    description: 'Files or directories to check'
+    required: false
+    default: '.'
+  severity:
+    description: 'Minimum severity to report (error or warning)'
+    required: false
+    default: 'warning'
+  fail-fast:
+    description: 'Stop after first error'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install sql-guard
+      shell: bash
+      run: pip install sql-guard
+    - name: Run sql-guard
+      shell: bash
+      run: |
+        sql-guard check ${{ inputs.paths }} \
+          --severity ${{ inputs.severity }} \
+          ${{ inputs.fail-fast == 'true' && '--fail-fast' || '' }}

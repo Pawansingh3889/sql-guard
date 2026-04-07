@@ -1,0 +1,7 @@
+- id: sql-guard
+  name: sql-guard
+  description: Fast rule-based SQL linter
+  entry: sql-guard check
+  language: python
+  types: [sql]
+  require_serial: false
