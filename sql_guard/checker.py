@@ -104,8 +104,37 @@ def check_file(
     2. Multi-line rules: statement-level (only if needed)
     """
     findings: list[Finding] = []
-    content = path.read_text(encoding="utf-8")
     file_str = str(path)
+
+    try:
+        content = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        try:
+            content = path.read_text(encoding="latin-1")
+        except Exception as e:
+            return [Finding(
+                rule_id="SYS",
+                severity="error",
+                file=file_str,
+                line=0,
+                message=f"Cannot read file: {e}",
+            )]
+    except PermissionError:
+        return [Finding(
+            rule_id="SYS",
+            severity="error",
+            file=file_str,
+            line=0,
+            message="Permission denied",
+        )]
+    except OSError as e:
+        return [Finding(
+            rule_id="SYS",
+            severity="error",
+            file=file_str,
+            line=0,
+            message=f"Cannot read file: {e}",
+        )]
 
     single_pass_rules = [r for r in rules if not r.multiline]
     multi_line_rules = [r for r in rules if r.multiline]
