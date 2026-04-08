@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "sqlguard"
+name = "sql-patrol"
 version = "0.1.0"
 description = "Fast rule-based SQL linter. Pre-commit hook + GitHub Action + CLI."
 readme = "README.md"
