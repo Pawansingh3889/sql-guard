@@ -1,5 +1,10 @@
 # sql-sop
 
+[![CI](https://github.com/Pawansingh3889/sql-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/Pawansingh3889/sql-guard/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/sql-sop)](https://pypi.org/project/sql-sop/)
+[![Python](https://img.shields.io/pypi/pyversions/sql-sop)](https://pypi.org/project/sql-sop/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 Fast, rule-based SQL linter. 15 rules. Zero config. Instant results.
 
 Catches dangerous SQL before it reaches production -- DELETE without WHERE, SQL injection patterns, SELECT *, and 12 more. Runs as a **CLI tool**, **pre-commit hook**, and **GitHub Action**.
