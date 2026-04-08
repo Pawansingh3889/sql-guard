@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sql-sop"
-version = "0.1.0"
+version = "0.1.1"
 description = "Fast rule-based SQL linter. Pre-commit hook + GitHub Action + CLI."
 readme = "README.md"
 license = "MIT"
@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [project.scripts]
-sql-guard = "sql_guard.cli:app"
+sql-sop = "sql_guard.cli:app"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.4"]

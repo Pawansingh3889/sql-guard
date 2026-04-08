@@ -1,4 +1,4 @@
-# sql-guard
+# sql-sop
 
 Fast, rule-based SQL linter. 15 rules. Zero config. Instant results.
 
@@ -11,8 +11,8 @@ For deeper AI-powered analysis, pair with [SQL Ops Reviewer](https://github.com/
 ## Quick start
 
 ```bash
-pip install sql-guard
-sql-guard check .
+pip install sql-sop
+sql-sop check .
 ```
 
 ```
@@ -29,7 +29,7 @@ Found 2 issues (1 error, 1 warning) in 1 file (0.001s)
 
 Most teams have **no SQL review process**. Some use an AI linter. The problem: AI is slow, expensive, and overkill for catching `DELETE FROM users;`.
 
-sql-guard and SQL Ops Reviewer solve this together:
+sql-sop and SQL Ops Reviewer solve this together:
 
 ```
                     ┌─────────────────────────────────────┐
@@ -133,13 +133,13 @@ That's it. Two files. Every SQL change gets:
 ### Step 3 (optional): CLI for manual checks
 
 ```bash
-pip install sql-guard
+pip install sql-sop
 
-sql-guard check .                          # scan current directory
-sql-guard check queries/ --severity error  # errors only
-sql-guard check . --fail-fast              # stop on first error
-sql-guard check . --disable E002 W008      # skip specific rules
-sql-guard list-rules                       # show all 15 rules
+sql-sop check .                          # scan current directory
+sql-sop check queries/ --severity error  # errors only
+sql-sop check . --fail-fast              # stop on first error
+sql-sop check . --disable E002 W008      # skip specific rules
+sql-sop list-rules                       # show all 15 rules
 ```
 
 ---
@@ -178,20 +178,20 @@ sql-guard list-rules                       # show all 15 rules
 ### Disable specific rules
 
 ```bash
-sql-guard check . --disable E002 W008 W010
+sql-sop check . --disable E002 W008 W010
 ```
 
 ### Severity filtering
 
 ```bash
-sql-guard check . --severity error    # only show errors
-sql-guard check . --severity warning  # show everything (default)
+sql-sop check . --severity error    # only show errors
+sql-sop check . --severity warning  # show everything (default)
 ```
 
 ### Fail fast
 
 ```bash
-sql-guard check . --fail-fast  # stop after first error found
+sql-sop check . --fail-fast  # stop after first error found
 ```
 
 ---
@@ -215,7 +215,7 @@ Benchmark: 200 SQL files, 15 rules
 
 ## How it compares
 
-| | sql-guard | sqlfluff | sql-lint |
+| | sql-sop | sqlfluff | sql-lint |
 |---|---|---|---|
 | Rules | 15 (focused) | 800+ (comprehensive) | ~20 |
 | Speed | <0.1s for 200 files | 45s for 200 files | ~2s |
@@ -225,7 +225,7 @@ Benchmark: 200 SQL files, 15 rules
 | GitHub Action | Yes | Community | No |
 | AI integration | Pairs with SQL Ops Reviewer | No | No |
 
-sql-guard is not a replacement for sqlfluff. It's a fast first pass that catches 80% of real issues with zero setup. If you need dialect-specific formatting and 800 rules, use sqlfluff. If you want instant feedback on dangerous SQL, use sql-guard.
+sql-sop is not a replacement for sqlfluff. It's a fast first pass that catches 80% of real issues with zero setup. If you need dialect-specific formatting and 800 rules, use sqlfluff. If you want instant feedback on dangerous SQL, use sql-guard.
 
 ---
 

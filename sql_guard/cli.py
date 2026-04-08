@@ -1,4 +1,4 @@
-"""sql-guard CLI — check SQL files for common issues."""
+"""sql-sop CLI -- check SQL files for common issues."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from sql_guard.reporters.terminal import print_result
 from sql_guard.rules import ALL_RULES
 
 app = typer.Typer(
-    name="sql-guard",
+    name="sql-sop",
     help="Fast rule-based SQL linter.",
     no_args_is_help=True,
 )

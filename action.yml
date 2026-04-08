@@ -1,4 +1,4 @@
-name: 'sql-guard'
+name: 'sql-sop'
 description: 'Fast rule-based SQL linter for pull requests'
 inputs:
   paths:
@@ -20,12 +20,12 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-    - name: Install sql-guard
+    - name: Install sql-sop
       shell: bash
-      run: pip install sql-guard
-    - name: Run sql-guard
+      run: pip install sql-sop
+    - name: Run sql-sop
       shell: bash
       run: |
-        sql-guard check ${{ inputs.paths }} \
+        sql-sop check ${{ inputs.paths }} \
           --severity ${{ inputs.severity }} \
           ${{ inputs.fail-fast == 'true' && '--fail-fast' || '' }}
