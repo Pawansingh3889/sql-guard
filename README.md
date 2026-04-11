@@ -5,9 +5,11 @@
 [![Python](https://img.shields.io/pypi/pyversions/sql-sop)](https://pypi.org/project/sql-sop/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Fast, rule-based SQL linter. 15 rules. Zero config. Instant results.
+Fast, rule-based SQL linter. 15 rules. Zero config. Instant results. 195+ monthly downloads on PyPI.
 
 Catches dangerous SQL before it reaches production -- DELETE without WHERE, SQL injection patterns, SELECT *, and 12 more. Runs as a **CLI tool**, **pre-commit hook**, and **GitHub Action**.
+
+Used in production data pipelines to lint SQL before it reaches manufacturing ERP databases. Prevents dangerous patterns like DELETE without WHERE from running against production SI Integreater tables.
 
 For deeper AI-powered analysis, pair with [SQL Ops Reviewer](https://github.com/Pawansingh3889/sql-ops-reviewer).
 
@@ -215,6 +217,12 @@ Benchmark: 200 SQL files, 15 rules
   sql-guard:  0.08 seconds
   sqlfluff:   45 seconds (560x slower)
 ```
+
+---
+
+## Production Use Case
+
+In a fish production environment, sql-sop runs as a pre-commit hook on all SQL that touches ERP data (RunNumber, OCM_TRANS, OCM_PLU, OCM_TOTALS tables). Combined with read-only database users and Docker isolation, it forms part of a 6-layer safety architecture that prevents accidental writes to the production ERP.
 
 ---
 
