@@ -12,6 +12,32 @@
 - Install: `pip install sql-sop`
 - [Profile](https://github.com/Pawansingh3889)
 
+## Why Does This Exist?
+
+One bad SQL query can delete production data, expose customer records, or bring down a database. Most teams only find out after the damage is done. sql-sop catches dangerous patterns automatically — before the query ever runs — in 0.08 seconds.
+
+### Key Numbers
+
+| | |
+|---|---|
+| Rules | 15 (5 errors, 10 warnings) |
+| Tests | 46 |
+| Scan speed | 0.08s across 200 files |
+| PyPI downloads | 195+/month |
+| Version | 0.2.0 |
+
+### Fluent API (v0.2.0)
+
+```python
+from sql_guard import SqlGuard
+
+result = SqlGuard().enable("E001", "W001").scan("DELETE FROM users")
+print(result.passed)    # False
+print(result.summary()) # "1 error, 0 warnings in 1 statement"
+```
+
+---
+
 Fast, rule-based SQL linter. 15 rules. Zero config. Instant results. 195+ monthly downloads on PyPI.
 
 Catches dangerous SQL before it reaches production -- DELETE without WHERE, SQL injection patterns, SELECT *, and 12 more. Runs as a **CLI tool**, **pre-commit hook**, and **GitHub Action**.
