@@ -1,4 +1,4 @@
-"""Tests for all 15 rules."""
+"""Tests for all 18 rules."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 class TestRuleRegistry:
     def test_all_rules_loaded(self) -> None:
-        assert len(ALL_RULES) == 15
+        assert len(ALL_RULES) == 18
 
     def test_5_errors(self) -> None:
         errors = [r for r in ALL_RULES if r.severity == "error"]
@@ -26,7 +26,7 @@ class TestRuleRegistry:
 
     def test_10_warnings(self) -> None:
         warnings = [r for r in ALL_RULES if r.severity == "warning"]
-        assert len(warnings) == 10
+        assert len(warnings) == 13
 
     def test_unique_ids(self) -> None:
         ids = [r.id for r in ALL_RULES]

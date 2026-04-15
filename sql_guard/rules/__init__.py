@@ -22,6 +22,11 @@ from sql_guard.rules.warnings import (
     SubqueryCouldBeJoin,
     CommentedOutCode,
 )
+from sql_guard.rules.structural import (
+    DeeplyNestedSubquery,
+    ImplicitCrossJoin,
+    UnusedCTE,
+)
 
 ALL_RULES: list[Rule] = [
     # Errors (E001-E005)
@@ -41,6 +46,10 @@ ALL_RULES: list[Rule] = [
     MixedCaseKeywords(),
     MissingSemicolon(),
     CommentedOutCode(),
+    # Structural (S001-S003)
+    ImplicitCrossJoin(),
+    DeeplyNestedSubquery(),
+    UnusedCTE(),
 ]
 
 

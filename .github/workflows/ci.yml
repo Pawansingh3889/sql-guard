@@ -22,10 +22,15 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,structural]"
 
       - name: Lint
         run: ruff check sql_guard tests
+
+      - name: Type check (ty)
+        run: |
+          pip install ty
+          ty check sql_guard/ || true
 
       - name: Test
         run: pytest tests/ -v
