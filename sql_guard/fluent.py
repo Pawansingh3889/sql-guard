@@ -25,7 +25,7 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from sql_guard.checker import check, check_file, discover_files
+from sql_guard.checker import check, check_file
 from sql_guard.rules import get_rules
 from sql_guard.rules.base import Finding
 
