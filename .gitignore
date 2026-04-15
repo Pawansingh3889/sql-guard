@@ -5,9 +5,3 @@ dist/
 build/
 .venv/
 .sql-guard-cache/
-
-# AI tools
-.claude/
-.cursorrules
-.continue/
-.aider*
