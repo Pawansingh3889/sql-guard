@@ -20,11 +20,11 @@ One bad SQL query can delete production data, expose customer records, or bring 
 
 | | |
 |---|---|
-| Rules | 15 (5 errors, 10 warnings) |
-| Tests | 46 |
+| Rules | 22 (9 errors, 13 warnings) |
+| Tests | 76 |
 | Scan speed | 0.08s across 200 files |
 | PyPI downloads | 195+/month |
-| Version | 0.2.0 |
+| Version | 0.4.0 |
 
 ### Fluent API (v0.2.0)
 
@@ -53,6 +53,10 @@ For deeper AI-powered analysis, pair with [SQL Ops Reviewer](https://github.com/
 ```bash
 pip install sql-sop
 sql-sop check .
+
+# Also scan .py files for SQL hazards in execute()/read_sql() calls:
+pip install "sql-sop[python]"
+sql-sop check . --include-python
 ```
 
 ```
@@ -210,6 +214,21 @@ sql-sop list-rules                       # show all 15 rules
 | W008 | `mixed-case-keywords` | `select ... FROM` -- inconsistent casing |
 | W009 | `missing-semicolon` | Statement not terminated with `;` |
 | W010 | `commented-out-code` | `-- SELECT * FROM old_table` -- use version control |
+
+### Python scanning (v0.4.0+, opt-in)
+
+Enable with `pip install "sql-sop[python]"` and `--include-python`. Uses
+libCST to walk Python source and extract SQL strings from `.execute()`,
+`.read_sql()`, `sqlalchemy.text(...)` calls and `sql =`/`query =` style
+assignments. Then applies every rule above, plus four that only make
+sense at the Python level:
+
+| ID | Name | What it catches |
+|---|---|---|
+| P001 | `fstring-in-execute` | `cursor.execute(f"... {user_input}")` -- SQL injection |
+| P002 | `concat-in-execute` | `cursor.execute("..." + user_input)` -- SQL injection |
+| P003 | `format-in-execute` | `.format()` or `%` interpolation into an execute call |
+| P004 | `bare-variable-in-execute` | `cursor.execute(query)` where `query` is an unchecked variable |
 
 ---
 

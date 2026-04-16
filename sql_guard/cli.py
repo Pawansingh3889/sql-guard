@@ -12,6 +12,7 @@ from sql_guard import __version__
 from sql_guard.checker import check
 from sql_guard.reporters.terminal import print_result
 from sql_guard.rules import ALL_RULES
+from sql_guard.rules.python_rules import PYTHON_RULES
 
 app = typer.Typer(
     name="sql-sop",
@@ -27,13 +28,24 @@ def check_cmd(
     severity: str = typer.Option("warning", "--severity", "-s", help="Minimum severity: error or warning."),
     fail_fast: bool = typer.Option(False, "--fail-fast", help="Stop after first error."),
     disable: Optional[list[str]] = typer.Option(None, "--disable", "-d", help="Rule IDs to disable."),
+    include_python: bool = typer.Option(
+        False,
+        "--include-python",
+        help="Also scan .py files for SQL strings in execute() calls (requires sql-sop[python]).",
+    ),
 ) -> None:
     """Check SQL files for common issues."""
     if not paths:
         paths = ["."]
 
     disabled = set(disable) if disable else None
-    result = check(paths, severity=severity, fail_fast=fail_fast, disabled_rules=disabled)
+    result = check(
+        paths,
+        severity=severity,
+        fail_fast=fail_fast,
+        disabled_rules=disabled,
+        include_python=include_python,
+    )
     print_result(result)
 
     if result.error_count > 0:
@@ -50,6 +62,10 @@ def list_rules() -> None:
     table.add_column("Description", style="dim")
 
     for rule in ALL_RULES:
+        sev = "[red]error[/red]" if rule.severity == "error" else "[yellow]warning[/yellow]"
+        table.add_row(rule.id, sev, rule.name, rule.description)
+
+    for rule in PYTHON_RULES:
         sev = "[red]error[/red]" if rule.severity == "error" else "[yellow]warning[/yellow]"
         table.add_row(rule.id, sev, rule.name, rule.description)
 

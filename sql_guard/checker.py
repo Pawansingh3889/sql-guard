@@ -9,6 +9,8 @@ from pathlib import Path
 
 from sql_guard.rules import get_rules
 from sql_guard.rules.base import Finding, Rule
+from sql_guard.rules.python_rules import PYTHON_RULES
+from sql_guard import python_scanner
 
 
 @dataclass
@@ -30,27 +32,38 @@ class CheckResult:
 
 
 SKIP_PATTERNS = {"*.min.sql", "*.bak"}
+PYTHON_SKIP_DIRS = {".venv", "venv", "__pycache__", "build", "dist", ".tox", ".mypy_cache"}
 
 
-def discover_files(paths: list[str], ignore: list[str] | None = None) -> list[Path]:
-    """Find all .sql files in the given paths, respecting ignore patterns."""
-    sql_files: list[Path] = []
+def discover_files(
+    paths: list[str],
+    ignore: list[str] | None = None,
+    include_python: bool = False,
+) -> list[Path]:
+    """Find SQL (and optionally Python) files in the given paths."""
+    collected: list[Path] = []
     ignore_set = set(ignore or [])
+    extensions: tuple[str, ...] = (".sql",)
+    if include_python:
+        extensions = (".sql", ".py")
 
     for p in paths:
         path = Path(p)
-        if path.is_file() and path.suffix == ".sql":
-            sql_files.append(path)
+        if path.is_file() and path.suffix in extensions:
+            collected.append(path)
         elif path.is_dir():
-            for f in path.rglob("*.sql"):
-                rel = str(f.relative_to(path))
-                if any(f.match(pat) for pat in SKIP_PATTERNS):
-                    continue
-                if any(part in rel for part in ignore_set):
-                    continue
-                sql_files.append(f)
+            for ext in extensions:
+                for f in path.rglob(f"*{ext}"):
+                    rel = str(f.relative_to(path))
+                    if any(f.match(pat) for pat in SKIP_PATTERNS):
+                        continue
+                    if any(part in rel for part in ignore_set):
+                        continue
+                    if ext == ".py" and any(skip in f.parts for skip in PYTHON_SKIP_DIRS):
+                        continue
+                    collected.append(f)
 
-    return sorted(sql_files)
+    return sorted(set(collected))
 
 
 def _split_statements(content: str) -> list[tuple[int, str]]:
@@ -162,14 +175,74 @@ def check_file(
     return findings
 
 
+def check_python_file(
+    path: Path,
+    rules: list[Rule],
+    disabled_rules: set[str] | None = None,
+    fail_fast: bool = False,
+) -> list[Finding]:
+    """Lint SQL strings embedded in a Python source file.
+
+    The Python-only P-rules always run on what the libCST scanner extracts.
+    For concrete string literals, the standard SQL rules also run so that
+    DELETE-without-WHERE, SELECT *, etc. are caught inside ``.py`` files.
+    """
+    findings: list[Finding] = []
+    file_str = str(path)
+
+    if not python_scanner.libcst_available():
+        findings.append(
+            Finding(
+                rule_id="SYS",
+                severity="warning",
+                file=file_str,
+                line=0,
+                message="Python scanning requested but libcst is not installed",
+                suggestion="pip install sql-sop[python]",
+            )
+        )
+        return findings
+
+    hits = python_scanner.extract_from_file(path)
+    disabled = disabled_rules or set()
+
+    for hit in hits:
+        # Python-only rules fire on every hit.
+        for rule in PYTHON_RULES:
+            if rule.id in disabled:
+                continue
+            finding = rule.check(hit, file_str)
+            if finding:
+                findings.append(finding)
+                if fail_fast and finding.severity == "error":
+                    return findings
+
+        # Standard SQL rules re-run on concrete literals only.
+        if hit.kind != "literal" or not hit.sql:
+            continue
+        for rule in rules:
+            if rule.multiline:
+                finding = rule.check_statement(hit.sql, hit.line, file_str)
+            else:
+                # Single-line rules evaluate the whole string as one line.
+                finding = rule.check_line(hit.sql, hit.line, file_str)
+            if finding:
+                findings.append(finding)
+                if fail_fast and finding.severity == "error":
+                    return findings
+
+    return findings
+
+
 def check(
     paths: list[str],
     severity: str = "warning",
     fail_fast: bool = False,
     disabled_rules: set[str] | None = None,
     ignore: list[str] | None = None,
+    include_python: bool = False,
 ) -> CheckResult:
-    """Run all rules against discovered SQL files.
+    """Run all rules against discovered SQL (and optionally Python) files.
 
     Args:
         paths: Files or directories to check.
@@ -177,19 +250,25 @@ def check(
         fail_fast: Stop after first error.
         disabled_rules: Set of rule IDs to skip.
         ignore: Path patterns to ignore.
+        include_python: Also scan ``.py`` files for embedded SQL via libCST.
 
     Returns:
         CheckResult with all findings.
     """
     t0 = time.perf_counter()
     rules = get_rules(disabled_ids=disabled_rules)
-    sql_files = discover_files(paths, ignore=ignore)
+    discovered = discover_files(paths, ignore=ignore, include_python=include_python)
 
     result = CheckResult()
-    result.files_checked = len(sql_files)
+    result.files_checked = len(discovered)
 
-    for path in sql_files:
-        file_findings = check_file(path, rules, fail_fast=fail_fast)
+    for path in discovered:
+        if path.suffix == ".py":
+            file_findings = check_python_file(
+                path, rules, disabled_rules=disabled_rules, fail_fast=fail_fast
+            )
+        else:
+            file_findings = check_file(path, rules, fail_fast=fail_fast)
 
         # Filter by severity
         if severity == "error":
