@@ -1,0 +1,101 @@
+name: Release
+
+# Fires when a tag matching v*.*.* is pushed (e.g. v0.4.0).
+# Builds the sdist + wheel, uploads them to the workflow run for audit,
+# publishes to PyPI via trusted publishing (no long-lived token needed),
+# and creates a GitHub release with the built artifacts attached.
+#
+# One-time setup on pypi.org before this workflow can succeed:
+#   https://pypi.org/manage/project/sql-sop/settings/publishing/
+#   Add a trusted publisher with:
+#     Owner:        Pawansingh3889
+#     Repository:   sql-guard
+#     Workflow:     release.yml
+#     Environment:  release
+# Until that publisher exists, the `publish` job will fail with an OIDC
+# error — the `build` job still runs so you get the artifacts.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build sdist and wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build backend
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Show built files
+        run: ls -lh dist/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/project/sql-sop/
+    permissions:
+      id-token: write  # required for PyPI trusted publishing (OIDC)
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+
+  github-release:
+    name: Attach artifacts to GitHub Release
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # required for creating a GitHub release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF##*/}"
+          gh release create "$tag" \
+            --title "$tag" \
+            --generate-notes \
+            dist/*
