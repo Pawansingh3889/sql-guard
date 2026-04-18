@@ -1,0 +1,46 @@
+name: Welcome first-time contributors
+
+on:
+  pull_request_target:
+    types: [opened]
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            Thanks for opening your first issue on sql-sop! A few pointers:
+
+            - If this is a **security / rule-bypass** report, please close
+              this issue and file a [private advisory](../../security/advisories/new)
+              instead — see [`SECURITY.md`](../blob/main/SECURITY.md).
+            - If you're proposing a **new rule**, the shape is in
+              [`CONTRIBUTING.md`](../blob/main/CONTRIBUTING.md) § "Adding a new rule".
+            - If this is a **false positive or false negative**, include
+              the exact SQL, rule ID, sql-sop version, and your
+              `.pre-commit-config.yaml` (or CI workflow step).
+
+            The maintainer replies within 7 calendar days
+            (see [`GOVERNANCE.md`](../blob/main/GOVERNANCE.md)).
+          pr-message: |
+            Thanks for your first PR on sql-sop! Quick checks:
+
+            - `pytest -q` and `ruff check .` pass locally
+            - Every new rule has both a "fires on bad SQL" test AND a
+              "does NOT fire on safe SQL" test
+            - Rule IDs (`E001`, `W001`, …) are public API — don't renumber
+              or rename existing ones without the deprecation process in
+              [`GOVERNANCE.md`](../blob/main/GOVERNANCE.md)
+            - `CHANGELOG.md` `[Unreleased]` entry for any user-facing change
+
+            First-PR-wins on the linked issue applies for 7 days. The
+            maintainer will review within 14 days of your last response.
