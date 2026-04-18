@@ -1,0 +1,20 @@
+{
+  "name": "sql-sop",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "postCreateCommand": "pip install --upgrade pip && pip install -e '.[python]' && pip install pytest ruff pre-commit && pre-commit install || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "[python]": {
+          "editor.formatOnSave": false
+        }
+      }
+    }
+  },
+  "remoteUser": "vscode"
+}
