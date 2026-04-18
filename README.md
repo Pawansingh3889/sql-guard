@@ -51,6 +51,10 @@ For deeper AI-powered analysis, pair with [SQL Ops Reviewer](https://github.com/
 
 ## Quick start
 
+**If sql-sop catches a real bug for you, a GitHub star is the easiest way
+to help — it makes the project more discoverable for people with the same
+problem.**
+
 ```bash
 pip install sql-sop
 sql-sop check .

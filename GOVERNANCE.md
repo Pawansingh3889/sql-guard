@@ -48,6 +48,16 @@ configurations. Proposal template:
 2. what replaces it (if anything)
 3. a deprecation window — usually one minor version
 
+### Architecture Decision Records (ADRs)
+
+Proposals that change *how* sql-sop works (new regex engine, new parser
+backend, new distribution format) are labelled **`ADR`** on the issue
+so they stay easy to find later. Pattern borrowed from Camila Maia's
+ScanAPI talk (PyCon DE 2026). After discussion lands on a decision, a
+follow-up issue with the task breakdown references back to the ADR, and
+the ADR issue stays open in an archived state as the record of "why we
+did it this way."
+
 ## Issue assignment (first-PR-wins)
 
 1. Comment "I'd like to work on this" — 7-day soft claim.
