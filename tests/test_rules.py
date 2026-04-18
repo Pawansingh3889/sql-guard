@@ -1,4 +1,4 @@
-"""Tests for all 18 rules."""
+"""Tests for all rules in the sql-sop rule registry."""
 
 from __future__ import annotations
 
@@ -18,13 +18,15 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 class TestRuleRegistry:
     def test_all_rules_loaded(self) -> None:
-        assert len(ALL_RULES) == 18
+        assert len(ALL_RULES) == 19
 
-    def test_5_errors(self) -> None:
+    def test_6_errors(self) -> None:
         errors = [r for r in ALL_RULES if r.severity == "error"]
-        assert len(errors) == 5
+        assert len(errors) == 6
 
-    def test_10_warnings(self) -> None:
+    def test_13_warnings(self) -> None:
+        # 10 "warning" (W-series) + 3 structural (S-series) all share the
+        # "warning" severity in the registry.
         warnings = [r for r in ALL_RULES if r.severity == "warning"]
         assert len(warnings) == 13
 
@@ -71,6 +73,22 @@ class TestErrorRules:
         findings = check([str(FIXTURES / "errors.sql")])
         e005 = [f for f in findings.findings if f.rule_id == "E005"]
         assert len(e005) >= 1
+
+    def test_e006_update_without_where(self) -> None:
+        findings = check([str(FIXTURES / "errors.sql")])
+        e006 = [f for f in findings.findings if f.rule_id == "E006"]
+        assert len(e006) >= 1
+        assert "UPDATE" in e006[0].message
+        assert "overwrite" in e006[0].message.lower() or "every row" in e006[0].message.lower()
+
+    def test_e006_update_with_where_ok(self, tmp_path) -> None:
+        # UPDATE ... WHERE must NOT trigger the rule. Belt-and-braces
+        # assertion so a future regex tweak can't silently over-trigger.
+        sql = tmp_path / "safe_update.sql"
+        sql.write_text("UPDATE orders SET status = 'shipped' WHERE id = 42;\n")
+        result = check([str(sql)])
+        e006 = [f for f in result.findings if f.rule_id == "E006"]
+        assert not e006
 
 
 # ---------------------------------------------------------------------------

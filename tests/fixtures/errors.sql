@@ -14,3 +14,6 @@ SELECT * FROM users WHERE name = '' + @input + '';
 
 -- E005: INSERT without column list
 INSERT INTO orders VALUES (1, 'test', 100);
+
+-- E006: UPDATE without WHERE
+UPDATE orders SET status = 'cancelled';

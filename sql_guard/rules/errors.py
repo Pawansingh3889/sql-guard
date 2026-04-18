@@ -125,3 +125,34 @@ class InsertWithoutColumns(Rule):
                 suggestion="Specify columns: INSERT INTO table (col1, col2) VALUES ...",
             )
         return None
+
+
+class UpdateWithoutWhere(Rule):
+    """E006: UPDATE statement without WHERE clause.
+
+    The silent twin of E001 (DELETE without WHERE). An UPDATE with no WHERE
+    rewrites every row in the table — a one-character mistake that can
+    silently corrupt an entire production table. E001 catches the deletion
+    case but UPDATE without WHERE has been an unwatched footgun until now.
+    """
+
+    id = "E006"
+    name = "update-without-where"
+    severity = "error"
+    description = "UPDATE without WHERE rewrites every row in the table"
+    multiline = True
+
+    _pattern = Rule._compile(r"\bUPDATE\s+\S+\s+SET\b")
+    _has_where = Rule._compile(r"\bWHERE\b")
+
+    def check_statement(self, statement: str, start_line: int, file: str) -> Finding | None:
+        if self._pattern.search(statement) and not self._has_where.search(statement):
+            return Finding(
+                rule_id=self.id,
+                severity=self.severity,
+                file=file,
+                line=start_line,
+                message="UPDATE without WHERE clause -- this will overwrite every row",
+                suggestion="Add a WHERE clause to limit affected rows",
+            )
+        return None

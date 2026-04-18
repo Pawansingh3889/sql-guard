@@ -9,6 +9,7 @@ from sql_guard.rules.errors import (
     GrantRevoke,
     InsertWithoutColumns,
     StringConcatInWhere,
+    UpdateWithoutWhere,
 )
 from sql_guard.rules.warnings import (
     FunctionOnIndexedColumn,
@@ -29,12 +30,13 @@ from sql_guard.rules.structural import (
 )
 
 ALL_RULES: list[Rule] = [
-    # Errors (E001-E005)
+    # Errors (E001-E006)
     DeleteWithoutWhere(),
     DropWithoutIfExists(),
     GrantRevoke(),
     StringConcatInWhere(),
     InsertWithoutColumns(),
+    UpdateWithoutWhere(),
     # Warnings (W001-W010)
     SelectStar(),
     MissingLimit(),
