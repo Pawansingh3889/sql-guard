@@ -20,8 +20,8 @@ One bad SQL query can delete production data, expose customer records, or bring 
 
 | | |
 |---|---|
-| Rules | 22 (9 errors, 13 warnings) |
-| Tests | 76 |
+| Rules | 23 (10 errors, 13 warnings) |
+| Tests | 78 |
 | Scan speed | 0.08s across 200 files |
 | PyPI downloads | 195+/month |
 | Version | 0.4.0 |
@@ -38,9 +38,9 @@ print(result.summary()) # "1 error, 0 warnings in 1 statement"
 
 ---
 
-Fast, rule-based SQL linter. 15 rules. Zero config. Instant results. 195+ monthly downloads on PyPI.
+Fast, rule-based SQL linter. 23 rules (19 SQL + 4 Python). Zero config. Instant results. 195+ monthly downloads on PyPI.
 
-Catches dangerous SQL before it reaches production -- DELETE without WHERE, SQL injection patterns, SELECT *, and 12 more. Runs as a **CLI tool**, **pre-commit hook**, and **GitHub Action**.
+Catches dangerous SQL before it reaches production -- DELETE without WHERE, UPDATE without WHERE, SQL injection patterns, SELECT *, and 19 more. Runs as a **CLI tool**, **pre-commit hook**, and **GitHub Action**.
 
 Used in production data pipelines to lint SQL before it reaches manufacturing ERP databases. Prevents dangerous patterns like DELETE without WHERE from running against production SI Integreater tables.
 
@@ -183,7 +183,7 @@ sql-sop check .                          # scan current directory
 sql-sop check queries/ --severity error  # errors only
 sql-sop check . --fail-fast              # stop on first error
 sql-sop check . --disable E002 W008      # skip specific rules
-sql-sop list-rules                       # show all 15 rules
+sql-sop list-rules                       # show every registered rule
 ```
 
 ---
@@ -199,6 +199,7 @@ sql-sop list-rules                       # show all 15 rules
 | E003 | `grant-revoke` | `GRANT SELECT ON users TO public;` -- privilege escalation |
 | E004 | `string-concat-in-where` | `WHERE id = '' + @input` -- SQL injection |
 | E005 | `insert-without-columns` | `INSERT INTO t VALUES (...)` -- breaks on schema change |
+| E006 | `update-without-where` | `UPDATE orders SET status = 'x';` -- overwrites every row |
 
 ### Warnings (advisory by default)
 
