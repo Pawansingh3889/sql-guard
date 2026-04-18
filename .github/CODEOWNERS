@@ -1,0 +1,13 @@
+# CODEOWNERS for sql-guard (sql-sop on PyPI)
+#
+# Every PR auto-requests review from the listed owner(s). Stops review
+# requests from getting lost when a PR author forgets to @-mention.
+#
+# Rule code and the release workflow are especially sensitive on a
+# published PyPI package — stable rule IDs are public API (see
+# GOVERNANCE.md § Scope discipline), and any release that ships is
+# reaching real users immediately.
+
+* @Pawansingh3889
+/sql_guard/rules/ @Pawansingh3889
+/.github/workflows/release.yml @Pawansingh3889
