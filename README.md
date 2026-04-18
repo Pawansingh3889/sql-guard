@@ -11,6 +11,7 @@
 - [Download Stats](https://pypistats.org/packages/sql-sop)
 - Install: `pip install sql-sop`
 - [Profile](https://github.com/Pawansingh3889)
+- **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`GOVERNANCE.md`](GOVERNANCE.md) · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · [`SECURITY.md`](SECURITY.md) · [`NOTICE`](NOTICE)
 
 ## Why Does This Exist?
 

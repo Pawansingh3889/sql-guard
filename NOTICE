@@ -1,0 +1,30 @@
+sql-sop (package name on PyPI; repository name "sql-guard")
+Copyright 2025-2026 Pawan Singh Kapkoti
+
+This product is licensed under the MIT License (see LICENSE).
+
+Why MIT and not Apache 2.0
+--------------------------
+sql-sop is published on PyPI (https://pypi.org/project/sql-sop/) and
+has been consumed as an MIT-licensed dependency by downstream users
+since v0.1.0. Relicensing a published package is a breaking change for
+users whose compliance pipelines are configured around a specific
+licence. If and when a major version bump (v1.0.0) happens, Apache 2.0
+will be considered at that point with a clear migration notice.
+
+Third-party dependencies
+------------------------
+sql-sop is a zero-dependency-at-runtime package (the core checker uses
+only the standard library). Optional extras pull in:
+
+- sqlparse (BSD-3-Clause) — structural rules, optional
+- libCST (MIT) — Python file scanning, optional (`pip install "sql-sop[python]"`)
+
+Each optional dependency's licence prevails over anything in this
+NOTICE file when that extra is installed.
+
+Trademarks
+----------
+"sql-sop" is not a registered trademark. If you fork or redistribute a
+modified version, please rename it so users can distinguish your fork
+from the upstream.
