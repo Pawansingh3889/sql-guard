@@ -1,0 +1,35 @@
+# Pre-commit hooks for sql-sop itself — dogfoods the tool this repo ships.
+#
+# Install: ``pre-commit install``. On every commit, hooks in this file run
+# against the staged files and either auto-fix (ruff --fix, trailing
+# whitespace) or block the commit with a readable error.
+
+repos:
+  # ── Standard hygiene ──────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-merge-conflict
+
+  # ── Ruff — lint + format, replaces flake8 + isort + black ──────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # ── sql-sop dogfooding itself ─────────────────────────────────────
+  # Runs sql-sop on the project's own fixtures + any staged .sql files
+  # so a regression in a rule is caught before it ships.
+  - repo: https://github.com/Pawansingh3889/sql-guard
+    rev: v0.4.0
+    hooks:
+      - id: sql-sop
+        args: [--severity, error]
+        files: \.sql$
