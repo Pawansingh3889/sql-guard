@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sql-sop playground</title>
+<meta name="description" content="Paste SQL, see lint. Runs sql-sop in your browser via Pyodide.">
+<link rel="canonical" href="https://pawansingh3889.github.io/sql-guard/">
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #171c24;
+    --fg: #e6e6e6;
+    --fg-dim: #8b8f97;
+    --accent: #ffcc33;
+    --err: #ff5f56;
+    --warn: #ffbd2e;
+    --ok: #28c940;
+    --border: #2a3140;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  header h1 span { color: var(--accent); }
+  header .links a { color: var(--fg-dim); margin-left: 16px; text-decoration: none; font-size: 14px; }
+  header .links a:hover { color: var(--fg); }
+  main { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); height: calc(100vh - 57px); }
+  section { background: var(--panel); padding: 16px; overflow: auto; }
+  section h2 { margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; color: var(--fg-dim); letter-spacing: 0.5px; font-weight: 600; }
+  textarea { width: 100%; height: calc(100% - 80px); background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; resize: none; outline: none; }
+  textarea:focus { border-color: var(--accent); }
+  .controls { margin-top: 10px; display: flex; gap: 10px; align-items: center; }
+  button { background: var(--accent); color: #000; border: 0; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+  button:disabled { background: var(--border); color: var(--fg-dim); cursor: not-allowed; }
+  #status { color: var(--fg-dim); font-size: 12px; }
+  #results { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+  .finding { padding: 8px 12px; margin: 6px 0; border-radius: 4px; background: var(--bg); border-left: 3px solid var(--border); }
+  .finding.error { border-left-color: var(--err); }
+  .finding.warning { border-left-color: var(--warn); }
+  .finding .id { color: var(--accent); font-weight: 600; }
+  .finding .sev-err { color: var(--err); font-weight: 600; }
+  .finding .sev-warn { color: var(--warn); font-weight: 600; }
+  .finding .line { color: var(--fg-dim); }
+  .finding .msg { color: var(--fg); }
+  .finding .sug { color: var(--fg-dim); font-style: italic; margin-top: 4px; }
+  .ok { color: var(--ok); }
+  .loading { color: var(--fg-dim); }
+  .error-box { color: var(--err); padding: 12px; background: rgba(255, 95, 86, 0.08); border-radius: 4px; }
+  footer { padding: 10px 24px; border-top: 1px solid var(--border); font-size: 12px; color: var(--fg-dim); text-align: center; }
+  footer a { color: var(--accent); text-decoration: none; }
+  @media (max-width: 720px) {
+    main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; height: auto; }
+    section { height: 50vh; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>sql-sop<span>/playground</span></h1>
+  <div class="links">
+    <a href="https://github.com/Pawansingh3889/sql-guard">GitHub</a>
+    <a href="https://pypi.org/project/sql-sop/">PyPI</a>
+  </div>
+</header>
+<main>
+  <section>
+    <h2>SQL</h2>
+    <textarea id="sql" spellcheck="false" placeholder="Paste SQL here...">-- Try editing the SQL below, then click "Lint"
+DELETE FROM orders;
+
+SELECT *
+FROM users
+WHERE YEAR(created_at) = 2026;
+
+SELECT id FROM orders_2024
+UNION
+SELECT id FROM orders_2025;</textarea>
+    <div class="controls">
+      <button id="run" disabled>Loading Python runtime...</button>
+      <span id="status">Warming up Pyodide (~5-10s, one-time)</span>
+    </div>
+  </section>
+  <section>
+    <h2>Lint output</h2>
+    <div id="results" class="loading">Waiting for Pyodide to load...</div>
+  </section>
+</main>
+<footer>
+  Runs sql-sop locally in your browser via
+  <a href="https://pyodide.org/">Pyodide</a>. No data leaves your machine.
+  &middot; <a href="https://github.com/Pawansingh3889/sql-guard/tree/main/playground">Source</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.3/full/pyodide.js"></script>
+<script>
+const runButton = document.getElementById('run');
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('results');
+const sqlEl = document.getElementById('sql');
+
+let pyodide = null;
+
+async function boot() {
+  try {
+    pyodide = await loadPyodide();
+    statusEl.textContent = 'Installing sql-sop from PyPI...';
+    await pyodide.loadPackage('micropip');
+    await pyodide.runPythonAsync(`
+import micropip
+await micropip.install('sql-sop')
+# sqlparse gives us structural rules
+await micropip.install('sqlparse')
+    `);
+    statusEl.textContent = 'Ready';
+    runButton.disabled = false;
+    runButton.textContent = 'Lint';
+    resultsEl.classList.remove('loading');
+    resultsEl.textContent = 'Click "Lint" to run sql-sop against the SQL on the left.';
+  } catch (err) {
+    statusEl.textContent = 'Failed to load';
+    resultsEl.innerHTML = '<div class="error-box">Couldn\\'t start the Python runtime: ' + String(err).replace(/</g, '&lt;') + '</div>';
+  }
+}
+
+async function lint() {
+  if (!pyodide) return;
+  runButton.disabled = true;
+  runButton.textContent = 'Running...';
+  resultsEl.innerHTML = '<span class="loading">Linting...</span>';
+  try {
+    const sql = sqlEl.value;
+    pyodide.globals.set('_sql_input', sql);
+    const findingsJson = await pyodide.runPythonAsync(`
+import json
+from sql_guard import SqlGuard
+
+result = SqlGuard().scan(_sql_input)
+payload = []
+for f in result.findings:
+    payload.append({
+        'rule_id': f.rule_id,
+        'severity': f.severity,
+        'line': f.line,
+        'message': f.message,
+        'suggestion': f.suggestion or '',
+    })
+json.dumps({
+    'findings': payload,
+    'summary': result.summary() if hasattr(result, 'summary') else f'{len(payload)} issue(s)',
+})
+    `);
+    renderResults(JSON.parse(findingsJson));
+  } catch (err) {
+    resultsEl.innerHTML = '<div class="error-box">Lint error: ' + String(err).replace(/</g, '&lt;') + '</div>';
+  } finally {
+    runButton.disabled = false;
+    runButton.textContent = 'Lint';
+  }
+}
+
+function renderResults(data) {
+  if (!data.findings.length) {
+    resultsEl.innerHTML = '<div class="ok">OK - no issues found.</div>';
+    return;
+  }
+  const rows = data.findings.map(f => {
+    const sevClass = f.severity === 'error' ? 'error' : 'warning';
+    const sevLabel = f.severity === 'error' ? '<span class="sev-err">ERROR</span>' : '<span class="sev-warn">WARN</span>';
+    const sug = f.suggestion ? `<div class="sug">-> ${escapeHtml(f.suggestion)}</div>` : '';
+    return `<div class="finding ${sevClass}"><span class="line">L${f.line}</span> ${sevLabel} <span class="id">[${escapeHtml(f.rule_id)}]</span> <span class="msg">${escapeHtml(f.message)}</span>${sug}</div>`;
+  }).join('');
+  resultsEl.innerHTML = rows + `<div style="margin-top:12px;color:var(--fg-dim)">${escapeHtml(data.summary)}</div>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+runButton.addEventListener('click', lint);
+sqlEl.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); lint(); }
+});
+
+boot();
+</script>
+</body>
+</html>
