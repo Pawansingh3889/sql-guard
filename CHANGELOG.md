@@ -10,6 +10,11 @@ a deprecation window (see `GOVERNANCE.md` § Scope discipline).
 
 ## [Unreleased]
 
+### Changed
+- Single-source the package version via importlib.metadata in sql_guard/__init__.py. pyproject.toml is now the only place a release number is hard-coded.
+- sqlparse is now a core dependency. Previously only in the [structural] extra, which meant S001-S003 silently no-op'd for users without it.
+- README counts refreshed: 24 rules (6E/14W/4P), 81 tests, version 0.4.1, pre-commit rev v0.4.1.
+
 ### Fixed
 - `test_duration_tracked` no longer fails on fast hardware where
   `time.perf_counter` resolution is coarser than the scan duration.
