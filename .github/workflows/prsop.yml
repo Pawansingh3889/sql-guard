@@ -15,5 +15,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - uses: Pawansingh3889/pr-sop@v0.1.0
