@@ -35,3 +35,38 @@ jobs:
           git for-each-ref --count=10 refs/tags
 
       - uses: Pawansingh3889/pr-sop@v0.1.1
+
+      - name: Python-level pr-sop inspection (temporary diag)
+        run: |
+          python3 -c '
+          from pr_sop.checks.precommit_rev_matches import PrecommitRevMatchesTag
+          from pr_sop.config import PrecommitRevMatchesTagConfig
+          from pr_sop.checks.base import CheckContext
+          from pathlib import Path
+
+          repo = Path(".").resolve()
+          cfg = PrecommitRevMatchesTagConfig(files=[".pre-commit-config.yaml", "README.md"])
+          c = PrecommitRevMatchesTag(config=cfg)
+
+          print("repo:", repo)
+          print("latest_tag:", repr(c._latest_tag(repo)))
+          origin = c._origin_url(repo)
+          print("origin:", repr(origin))
+          if origin:
+              print("normalised origin:", repr(c._normalise_repo_url(origin)))
+
+          matcher = c._build_repo_matcher(repo)
+          for url in [
+              "https://github.com/pre-commit/pre-commit-hooks",
+              "https://github.com/astral-sh/ruff-pre-commit",
+              "https://github.com/Pawansingh3889/sql-guard",
+          ]:
+              norm = c._normalise_repo_url(url)
+              print(f"url={url!r} norm={norm!r} matches={matcher(url)}")
+
+          ctx = CheckContext(repo_root=repo, changed_files=[])
+          findings = c.run(ctx)
+          print(f"findings: {len(findings)}")
+          for f in findings:
+              print("  ", f.file, f.line, f.message)
+          '
