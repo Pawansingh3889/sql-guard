@@ -36,37 +36,26 @@ jobs:
 
       - uses: Pawansingh3889/pr-sop@v0.1.1
 
-      - name: Python-level pr-sop inspection (temporary diag)
+      - name: Stderr capture for git describe (temporary diag)
         run: |
           python3 -c '
-          from pr_sop.checks.precommit_rev_matches import PrecommitRevMatchesTag
-          from pr_sop.config import PrecommitRevMatchesTagConfig
-          from pr_sop.checks.base import CheckContext
-          from pathlib import Path
-
-          repo = Path(".").resolve()
-          cfg = PrecommitRevMatchesTagConfig(files=[".pre-commit-config.yaml", "README.md"])
-          c = PrecommitRevMatchesTag(config=cfg)
-
-          print("repo:", repo)
-          print("latest_tag:", repr(c._latest_tag(repo)))
-          origin = c._origin_url(repo)
-          print("origin:", repr(origin))
-          if origin:
-              print("normalised origin:", repr(c._normalise_repo_url(origin)))
-
-          matcher = c._build_repo_matcher(repo)
-          for url in [
-              "https://github.com/pre-commit/pre-commit-hooks",
-              "https://github.com/astral-sh/ruff-pre-commit",
-              "https://github.com/Pawansingh3889/sql-guard",
-          ]:
-              norm = c._normalise_repo_url(url)
-              print(f"url={url!r} norm={norm!r} matches={matcher(url)}")
-
-          ctx = CheckContext(repo_root=repo, changed_files=[])
-          findings = c.run(ctx)
-          print(f"findings: {len(findings)}")
-          for f in findings:
-              print("  ", f.file, f.line, f.message)
+          import subprocess
+          r = subprocess.run(
+              ["git", "describe", "--tags", "--abbrev=0"],
+              cwd=".",
+              capture_output=True,
+              text=True,
+          )
+          print("rc:", r.returncode)
+          print("stdout:", repr(r.stdout))
+          print("stderr:", repr(r.stderr))
+          r2 = subprocess.run(
+              ["git", "-c", "safe.directory=*", "describe", "--tags", "--abbrev=0"],
+              cwd=".",
+              capture_output=True,
+              text=True,
+          )
+          print("with safe.directory=* rc:", r2.returncode)
+          print("with safe.directory=* stdout:", repr(r2.stdout))
+          print("with safe.directory=* stderr:", repr(r2.stderr))
           '
