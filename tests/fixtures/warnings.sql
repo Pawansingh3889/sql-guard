@@ -11,3 +11,8 @@ SELECT id FROM orders WHERE amount > 10000;
 
 -- W010: Commented-out code
 -- SELECT * FROM deleted_users;
+
+-- W011: UNION without ALL
+SELECT id FROM orders_2024
+UNION
+SELECT id FROM orders_2025;

@@ -18,17 +18,17 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 class TestRuleRegistry:
     def test_all_rules_loaded(self) -> None:
-        assert len(ALL_RULES) == 19
+        assert len(ALL_RULES) == 20
 
     def test_6_errors(self) -> None:
         errors = [r for r in ALL_RULES if r.severity == "error"]
         assert len(errors) == 6
 
-    def test_13_warnings(self) -> None:
-        # 10 "warning" (W-series) + 3 structural (S-series) all share the
+    def test_14_warnings(self) -> None:
+        # 11 "warning" (W-series) + 3 structural (S-series) all share the
         # "warning" severity in the registry.
         warnings = [r for r in ALL_RULES if r.severity == "warning"]
-        assert len(warnings) == 13
+        assert len(warnings) == 14
 
     def test_unique_ids(self) -> None:
         ids = [r.id for r in ALL_RULES]
@@ -116,6 +116,18 @@ class TestWarningRules:
         findings = check([str(FIXTURES / "warnings.sql")])
         w010 = [f for f in findings.findings if f.rule_id == "W010"]
         assert len(w010) >= 1
+
+    def test_w011_union_without_all(self) -> None:
+        findings = check([str(FIXTURES / "warnings.sql")])
+        w011 = [f for f in findings.findings if f.rule_id == "W011"]
+        assert len(w011) >= 1
+
+    def test_w011_passes_on_union_all(self) -> None:
+        from sql_guard.rules.warnings import UnionWithoutAll
+
+        rule = UnionWithoutAll()
+        statement = "SELECT id FROM orders_2024\nUNION ALL\nSELECT id FROM orders_2025;"
+        assert rule.check_statement(statement, 1, "test.sql") is None
 
 
 # ---------------------------------------------------------------------------
