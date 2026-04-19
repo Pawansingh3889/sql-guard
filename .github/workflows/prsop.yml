@@ -17,4 +17,4 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - uses: Pawansingh3889/pr-sop@v0.1.1
+      - uses: Pawansingh3889/pr-sop@v0.1.2
