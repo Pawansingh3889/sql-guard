@@ -13,4 +13,7 @@ checks:
     severity: warning
     files:
       - README.md
-      - .pre-commit-config.yaml
+    # .pre-commit-config.yaml is omitted because pr-sop v0.1.0 flags every
+    # `rev:` pin against our latest tag, including third-party pins
+    # (pre-commit-hooks, ruff-pre-commit). Re-add once pr-sop v0.1.1
+    # restricts the check to pins pointing at this repo's own origin URL.
