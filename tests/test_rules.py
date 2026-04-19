@@ -18,17 +18,17 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 class TestRuleRegistry:
     def test_all_rules_loaded(self) -> None:
-        assert len(ALL_RULES) == 20
+        assert len(ALL_RULES) == 21
 
     def test_6_errors(self) -> None:
         errors = [r for r in ALL_RULES if r.severity == "error"]
         assert len(errors) == 6
 
-    def test_14_warnings(self) -> None:
-        # 11 "warning" (W-series) + 3 structural (S-series) all share the
+    def test_15_warnings(self) -> None:
+        # 12 "warning" (W-series) + 3 structural (S-series) all share the
         # "warning" severity in the registry.
         warnings = [r for r in ALL_RULES if r.severity == "warning"]
-        assert len(warnings) == 14
+        assert len(warnings) == 15
 
     def test_unique_ids(self) -> None:
         ids = [r.id for r in ALL_RULES]
@@ -127,6 +127,42 @@ class TestWarningRules:
 
         rule = UnionWithoutAll()
         statement = "SELECT id FROM orders_2024\nUNION ALL\nSELECT id FROM orders_2025;"
+        assert rule.check_statement(statement, 1, "test.sql") is None
+
+    def test_w012_group_by_ordinal(self) -> None:
+        findings = check([str(FIXTURES / "warnings.sql")])
+        w012 = [f for f in findings.findings if f.rule_id == "W012"]
+        assert len(w012) >= 1
+
+    def test_w012_catches_single_ordinal(self) -> None:
+        from sql_guard.rules.warnings import GroupByOrdinal
+
+        rule = GroupByOrdinal()
+        statement = "SELECT region, COUNT(*) FROM orders GROUP BY 1;"
+        assert rule.check_statement(statement, 1, "test.sql") is not None
+
+    def test_w012_catches_multiple_ordinals(self) -> None:
+        from sql_guard.rules.warnings import GroupByOrdinal
+
+        rule = GroupByOrdinal()
+        statement = "SELECT a, b, c, COUNT(*) FROM t GROUP BY 1, 2, 3;"
+        assert rule.check_statement(statement, 1, "test.sql") is not None
+
+    def test_w012_passes_on_explicit_columns(self) -> None:
+        from sql_guard.rules.warnings import GroupByOrdinal
+
+        rule = GroupByOrdinal()
+        statement = "SELECT region, status, COUNT(*) FROM orders GROUP BY region, status;"
+        assert rule.check_statement(statement, 1, "test.sql") is None
+
+    def test_w012_passes_on_digit_prefixed_column_name(self) -> None:
+        from sql_guard.rules.warnings import GroupByOrdinal
+
+        # Column names that start with a digit ('1st_quarter') are valid
+        # identifiers in dialects that quote them, and the regex must not
+        # match them because they are not pure integer tokens.
+        rule = GroupByOrdinal()
+        statement = "SELECT 1st_quarter, COUNT(*) FROM sales GROUP BY 1st_quarter;"
         assert rule.check_statement(statement, 1, "test.sql") is None
 
 

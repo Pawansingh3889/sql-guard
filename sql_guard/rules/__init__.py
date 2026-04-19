@@ -13,6 +13,7 @@ from sql_guard.rules.errors import (
 )
 from sql_guard.rules.warnings import (
     FunctionOnIndexedColumn,
+    GroupByOrdinal,
     HardcodedValues,
     MissingLimit,
     MissingSemicolon,
@@ -38,7 +39,7 @@ ALL_RULES: list[Rule] = [
     StringConcatInWhere(),
     InsertWithoutColumns(),
     UpdateWithoutWhere(),
-    # Warnings (W001-W011)
+    # Warnings (W001-W012)
     SelectStar(),
     MissingLimit(),
     FunctionOnIndexedColumn(),
@@ -50,6 +51,7 @@ ALL_RULES: list[Rule] = [
     MissingSemicolon(),
     CommentedOutCode(),
     UnionWithoutAll(),
+    GroupByOrdinal(),
     # Structural (S001-S003)
     ImplicitCrossJoin(),
     DeeplyNestedSubquery(),

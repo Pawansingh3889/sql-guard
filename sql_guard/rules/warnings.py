@@ -270,6 +270,36 @@ class CommentedOutCode(Rule):
         return None
 
 
+class GroupByOrdinal(Rule):
+    """W012: GROUP BY <positional-ordinal> is terse but brittle."""
+
+    id = "W012"
+    name = "group-by-ordinal"
+    severity = "warning"
+    description = (
+        "GROUP BY by column position is non-portable and silently breaks if the "
+        "SELECT list is reordered"
+    )
+    multiline = True
+
+    # \b\d+\b only matches a pure integer token. Column names like 1st_quarter
+    # stay intact because '1' is followed by a word character, so the trailing
+    # word boundary does not hold — no false positives on digit-prefixed names.
+    _pattern = Rule._compile(r"\bGROUP\s+BY\s+\d+\b(\s*,\s*\d+\b)*")
+
+    def check_statement(self, statement: str, start_line: int, file: str) -> Finding | None:
+        if self._pattern.search(statement):
+            return Finding(
+                rule_id=self.id,
+                severity=self.severity,
+                file=file,
+                line=start_line,
+                message="GROUP BY by ordinal position -- fragile, reorder-sensitive",
+                suggestion="Use explicit column names in GROUP BY to survive SELECT list reorders",
+            )
+        return None
+
+
 class UnionWithoutAll(Rule):
     """W011: UNION without ALL forces sort-and-dedupe."""
 
