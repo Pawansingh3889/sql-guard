@@ -1,0 +1,16 @@
+checks:
+  changelog_required:
+    severity: error
+    paths:
+      - "sql_guard/**/*.py"
+      - "pyproject.toml"
+
+  # version_consistency: not configured. The package version is single-sourced
+  # via importlib.metadata.version("sql-sop") from installed metadata, so no
+  # second file carries a literal version string that could drift from pyproject.
+
+  precommit_rev_matches_tag:
+    severity: warning
+    files:
+      - README.md
+      - .pre-commit-config.yaml
