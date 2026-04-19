@@ -17,4 +17,21 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Diagnose git state (temporary for pr-sop v0.1.2 debugging)
+        run: |
+          echo "=== HEAD ==="
+          git rev-parse HEAD
+          echo "=== branch state ==="
+          git rev-parse --abbrev-ref HEAD || true
+          echo "=== tags visible ==="
+          git tag -l | head -20
+          echo "=== git describe --tags --abbrev=0 ==="
+          git describe --tags --abbrev=0 || echo "(failed)"
+          echo "=== origin URL ==="
+          git remote get-url origin
+          echo "=== log ==="
+          git log --oneline -5
+          echo "=== refs ==="
+          git for-each-ref --count=10 refs/tags
+
       - uses: Pawansingh3889/pr-sop@v0.1.1
