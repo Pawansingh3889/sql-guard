@@ -22,6 +22,7 @@ from sql_guard.rules.warnings import (
     SelectStar,
     SubqueryCouldBeJoin,
     CommentedOutCode,
+    UnionWithoutAll,
 )
 from sql_guard.rules.structural import (
     DeeplyNestedSubquery,
@@ -37,7 +38,7 @@ ALL_RULES: list[Rule] = [
     StringConcatInWhere(),
     InsertWithoutColumns(),
     UpdateWithoutWhere(),
-    # Warnings (W001-W010)
+    # Warnings (W001-W011)
     SelectStar(),
     MissingLimit(),
     FunctionOnIndexedColumn(),
@@ -48,6 +49,7 @@ ALL_RULES: list[Rule] = [
     MixedCaseKeywords(),
     MissingSemicolon(),
     CommentedOutCode(),
+    UnionWithoutAll(),
     # Structural (S001-S003)
     ImplicitCrossJoin(),
     DeeplyNestedSubquery(),

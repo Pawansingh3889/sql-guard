@@ -268,3 +268,27 @@ class CommentedOutCode(Rule):
                 suggestion="Remove dead code -- it's in version control history",
             )
         return None
+
+
+class UnionWithoutAll(Rule):
+    """W011: UNION without ALL forces sort-and-dedupe."""
+
+    id = "W011"
+    name = "union-without-all"
+    severity = "warning"
+    description = "UNION forces sort-and-dedupe -- use UNION ALL when duplicates are impossible"
+    multiline = True
+
+    _pattern = Rule._compile(r"\bUNION\b(?!\s+ALL\b)")
+
+    def check_statement(self, statement: str, start_line: int, file: str) -> Finding | None:
+        if self._pattern.search(statement):
+            return Finding(
+                rule_id=self.id,
+                severity=self.severity,
+                file=file,
+                line=start_line,
+                message="UNION without ALL -- sort-and-dedupe may be unnecessary",
+                suggestion="Use UNION ALL if duplicate rows are impossible or undesired to remove",
+            )
+        return None
