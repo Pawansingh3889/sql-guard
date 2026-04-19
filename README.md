@@ -223,6 +223,7 @@ sql-sop list-rules                       # show every registered rule
 | W008 | `mixed-case-keywords` | `select ... FROM` -- inconsistent casing |
 | W009 | `missing-semicolon` | Statement not terminated with `;` |
 | W010 | `commented-out-code` | `-- SELECT * FROM old_table` -- use version control |
+| W013 | `window-missing-order-partition` | `OVER ()` -- unpredictable results and unclear intent |
 
 ### Python scanning (v0.4.0+, opt-in)
 

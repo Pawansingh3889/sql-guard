@@ -18,7 +18,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 class TestRuleRegistry:
     def test_all_rules_loaded(self) -> None:
-        assert len(ALL_RULES) == 20
+        assert len(ALL_RULES) == 21
 
     def test_6_errors(self) -> None:
         errors = [r for r in ALL_RULES if r.severity == "error"]
@@ -28,7 +28,7 @@ class TestRuleRegistry:
         # 11 "warning" (W-series) + 3 structural (S-series) all share the
         # "warning" severity in the registry.
         warnings = [r for r in ALL_RULES if r.severity == "warning"]
-        assert len(warnings) == 14
+        assert len(warnings) == 15
 
     def test_unique_ids(self) -> None:
         ids = [r.id for r in ALL_RULES]
@@ -128,6 +128,11 @@ class TestWarningRules:
         rule = UnionWithoutAll()
         statement = "SELECT id FROM orders_2024\nUNION ALL\nSELECT id FROM orders_2025;"
         assert rule.check_statement(statement, 1, "test.sql") is None
+
+    def test_w013_window_missing_order_partition(self) -> None:
+        findings = check([str(FIXTURES / "warnings.sql")])
+        w013 = [f for f in findings.findings if f.rule_id == "W013"]
+        assert len(w013) >= 1
 
 
 # ---------------------------------------------------------------------------
