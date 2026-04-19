@@ -16,3 +16,8 @@ SELECT id FROM orders WHERE amount > 10000;
 SELECT id FROM orders_2024
 UNION
 SELECT id FROM orders_2025;
+
+-- W012: GROUP BY by ordinal
+SELECT region, status, COUNT(*)
+FROM orders
+GROUP BY 1, 2;
