@@ -1,0 +1,20 @@
+name: pr-sop
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  prsop:
+    name: PR governance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: Pawansingh3889/pr-sop@v0.1.0
