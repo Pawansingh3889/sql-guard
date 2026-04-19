@@ -24,11 +24,11 @@ One bad SQL query can delete production data, expose customer records, or bring 
 
 | | |
 |---|---|
-| Rules | 23 (10 errors, 13 warnings) |
-| Tests | 78 |
+| Rules | 24 (6 errors, 14 warnings, 4 Python-source) |
+| Tests | 81 |
 | Scan speed | 0.08s across 200 files |
 | PyPI downloads | 195+/month |
-| Version | 0.4.0 |
+| Version | 0.4.1 |
 
 ### Fluent API (v0.2.0)
 
@@ -42,9 +42,9 @@ print(result.summary()) # "1 error, 0 warnings in 1 statement"
 
 ---
 
-Fast, rule-based SQL linter. 23 rules (19 SQL + 4 Python). Zero config. Instant results. 195+ monthly downloads on PyPI.
+Fast, rule-based SQL linter. 24 rules (20 SQL + 4 Python). Zero config. Instant results. 195+ monthly downloads on PyPI.
 
-Catches dangerous SQL before it reaches production -- DELETE without WHERE, UPDATE without WHERE, SQL injection patterns, SELECT *, and 19 more. Runs as a **CLI tool**, **pre-commit hook**, and **GitHub Action**.
+Catches dangerous SQL before it reaches production -- DELETE without WHERE, UPDATE without WHERE, SQL injection patterns, SELECT *, and 20 more. Runs as a **CLI tool**, **pre-commit hook**, and **GitHub Action**.
 
 Used in production data pipelines to lint SQL before it reaches manufacturing ERP databases. Prevents dangerous patterns like DELETE without WHERE from running against production SI Integreater tables.
 
@@ -131,7 +131,7 @@ You want both.
 # .pre-commit-config.yaml
 repos:
   - repo: https://github.com/Pawansingh3889/sql-guard
-    rev: v0.1.0
+    rev: v0.4.1
     hooks:
       - id: sql-guard
         args: [--severity, error]  # only block on errors locally
@@ -269,12 +269,12 @@ sql-sop check . --fail-fast  # stop after first error found
 sql-guard is designed to be fast:
 
 - **Compiled regex** -- patterns compiled once at startup, reused per file
-- **Two-pass scanning** -- single-line rules run first (10 of 15 rules), multi-line parsing only when needed
+- **Two-pass scanning** -- single-line rules run first (8 of 20 SQL rules), multi-line parsing only when needed
 - **Line-by-line streaming** -- files read line by line, not loaded entirely into memory
 - **Early exit** -- `--fail-fast` stops on first error
 
 ```
-Benchmark: 200 SQL files, 15 rules
+Benchmark: 200 SQL files, 20 SQL rules
   sql-guard:  0.08 seconds
   sqlfluff:   45 seconds (560x slower)
 ```
@@ -291,7 +291,7 @@ In a fish production environment, sql-sop runs as a pre-commit hook on all SQL t
 
 | | sql-sop | sqlfluff | sql-lint |
 |---|---|---|---|
-| Rules | 15 (focused) | 800+ (comprehensive) | ~20 |
+| Rules | 24 (focused) | 800+ (comprehensive) | ~20 |
 | Speed | <0.1s for 200 files | 45s for 200 files | ~2s |
 | Config needed | Zero | Extensive | Minimal |
 | Language | Python | Python | JavaScript |
