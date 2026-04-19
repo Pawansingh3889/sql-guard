@@ -277,8 +277,8 @@ class GroupByOrdinal(Rule):
     name = "group-by-ordinal"
     severity = "warning"
     description = (
-        "GROUP BY by column position is non-portable and silently breaks if the "
-        "SELECT list is reordered"
+        "GROUP BY by column position silently breaks if the SELECT list is "
+        "reordered: a column insert or move changes which columns group"
     )
     multiline = True
 

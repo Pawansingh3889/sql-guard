@@ -10,6 +10,13 @@ a deprecation window (see `GOVERNANCE.md` § Scope discipline).
 
 ## [Unreleased]
 
+### Added
+- **W012 `group-by-ordinal`** - warns when `GROUP BY` uses positional
+  ordinals (`GROUP BY 1, 2`) instead of explicit column names. Ordinal
+  references are fragile to `SELECT` list reorders: inserting or
+  removing a column silently changes what the query groups by.
+  Explicit names are self-documenting and refactor-safe.
+
 ### Changed
 - Single-source the package version via importlib.metadata in sql_guard/__init__.py. pyproject.toml is now the only place a release number is hard-coded.
 - sqlparse is now a core dependency. Previously only in the [structural] extra, which meant S001-S003 silently no-op'd for users without it.
