@@ -3,6 +3,12 @@ contact_links:
   - name: Security report (rule bypass, false negative, CVE)
     url: https://github.com/Pawansingh3889/sql-guard/security/advisories/new
     about: Security issues go through the private advisory channel, not a public issue. See SECURITY.md.
-  - name: Discussion / question
+  - name: "Usage question - 'how do I...?'"
+    url: https://github.com/Pawansingh3889/sql-guard/discussions/categories/q-a
+    about: Ask in Discussions - lower friction than an issue, often a faster reply.
+  - name: "Show us how you're using sql-sop"
+    url: https://github.com/Pawansingh3889/sql-guard/discussions/categories/show-and-tell
+    about: Share your use case - we feature replies in the README.
+  - name: General discussion / open-ended question
     url: https://github.com/Pawansingh3889/sql-guard/discussions
-    about: Open-ended questions go in Discussions so issues stay actionable.
+    about: Anything that isn't a bug, rule request, or feature proposal.

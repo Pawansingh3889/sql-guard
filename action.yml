@@ -1,5 +1,9 @@
 name: 'sql-sop'
-description: 'Fast rule-based SQL linter for pull requests'
+description: 'Fast rule-based SQL linter - catches DELETE-without-WHERE, SQL injection, and 20+ other hazards in 0.08 seconds across 200 files.'
+author: 'Pawan Singh Kapkoti'
+branding:
+  icon: 'check-square'
+  color: 'blue'
 inputs:
   paths:
     description: 'Files or directories to check'
@@ -13,6 +17,10 @@ inputs:
     description: 'Stop after first error'
     required: false
     default: 'false'
+  include-python:
+    description: 'Also scan .py files for SQL strings in execute() / read_sql() / sqlalchemy.text() calls'
+    required: false
+    default: 'false'
 runs:
   using: 'composite'
   steps:
@@ -22,10 +30,16 @@ runs:
         python-version: '3.12'
     - name: Install sql-sop
       shell: bash
-      run: pip install sql-sop
+      run: |
+        if [ "${{ inputs.include-python }}" = "true" ]; then
+          pip install "sql-sop[python]"
+        else
+          pip install sql-sop
+        fi
     - name: Run sql-sop
       shell: bash
       run: |
         sql-sop check ${{ inputs.paths }} \
           --severity ${{ inputs.severity }} \
-          ${{ inputs.fail-fast == 'true' && '--fail-fast' || '' }}
+          ${{ inputs.fail-fast == 'true' && '--fail-fast' || '' }} \
+          ${{ inputs.include-python == 'true' && '--include-python' || '' }}

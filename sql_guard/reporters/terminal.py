@@ -49,3 +49,11 @@ def print_result(result: CheckResult) -> None:
         f"in {result.files_with_issues} file{'s' if result.files_with_issues != 1 else ''} "
         f"[dim]({result.duration_seconds}s)[/dim]"
     )
+
+    # Soft CTA - only when we actually found things, never on clean runs.
+    # Keep this single-line and dim so it doesn't drown out the real output.
+    console.print(
+        "[dim]Missing a pattern sql-sop should catch? "
+        "File a rule request: "
+        "https://github.com/Pawansingh3889/sql-guard/issues/new?template=rule-request.yml[/dim]"
+    )

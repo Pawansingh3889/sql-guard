@@ -10,12 +10,46 @@ a deprecation window (see `GOVERNANCE.md` § Scope discipline).
 
 ## [Unreleased]
 
+_(nothing yet)_
+
+## [0.4.1] - 2026-04-19
+
 ### Added
-- **Contributor paperwork** — `NOTICE`, `GOVERNANCE.md`, `SECURITY.md`,
-  `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` with the "Adding a new rule"
-  walkthrough. Issue templates for bug reports and feature requests,
-  PR template with the rule-addition checklist, CODEOWNERS routing
-  reviews, first-contributor welcome workflow, PR-title validator.
+- **GitHub Marketplace listing** — `action.yml` now declares `author` and
+  `branding` (icon: `check-square`, colour: `blue`), plus the previously
+  CLI-only `--include-python` surfaced as an action input. Ready to
+  publish via the Release UI's "Publish this Action to the GitHub
+  Marketplace" toggle.
+- **CLI feedback CTA** — when findings are reported, the terminal
+  reporter prints a single dim line pointing at the rule-request issue
+  template. Never fires on clean runs. Converts each real lint surface
+  into a silent engagement ask.
+- **Rule-request issue form** — `.github/ISSUE_TEMPLATE/rule-request.yml`
+  captures pattern, fail/pass examples, proposed severity, and whether
+  the reporter plans to open a PR. Complements the existing
+  `feature_request.yml` (which stays for non-rule enhancements).
+- **Issue-template config** — `.github/ISSUE_TEMPLATE/config.yml` now
+  routes usage questions to `Discussions/Q&A` and use-case posts to
+  `Discussions/Show-and-tell`, reducing issue-tracker noise.
+- **Comparison post** — `docs/blog/sqlfluff-vs-sql-sop.md` — honest
+  side-by-side with sqlfluff, positioning sql-sop as a pre-commit
+  "smoke detector" alongside sqlfluff's "spell-checker". Includes a
+  recommended dual-setup example.
+- **Hosted playground (scaffold)** — `playground/index.html` + deploy
+  README. Single-file Pyodide-based in-browser linter, ready to serve
+  from GitHub Pages or Cloudflare Pages. No bundler, no build step.
+- **Engagement pack** — `docs/engagement/` holds ten
+  good-first-issue rule drafts (W011-W018, S004, P005 placeholders),
+  a "Who's using sql-sop?" Discussion draft, multi-channel
+  announcement post drafts (LinkedIn / Twitter / Reddit / HN), and a
+  Marketplace release checklist.
+
+### Contributor paperwork (landed in this release as well)
+- `NOTICE`, `GOVERNANCE.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
+  `CONTRIBUTING.md` with the "Adding a new rule" walkthrough. Existing
+  bug-report and feature-request templates, PR template with the
+  rule-addition checklist, CODEOWNERS routing reviews,
+  first-contributor welcome workflow, PR-title validator.
 
 ### Changed
 - **Licence stays MIT, deliberately.** `NOTICE` explains: the package
