@@ -4,6 +4,9 @@
 [![PyPI](https://img.shields.io/pypi/v/sql-sop)](https://pypi.org/project/sql-sop/)
 [![Python](https://img.shields.io/pypi/pyversions/sql-sop)](https://pypi.org/project/sql-sop/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Marketplace](https://img.shields.io/badge/GitHub%20Marketplace-sql--sop-a07aff?logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/sql-sop)
+[![Playground](https://img.shields.io/badge/playground-try%20online-a07aff)](https://pawansingh3889.github.io/sql-guard/)
+[![Downloads](https://img.shields.io/pypi/dm/sql-sop?color=a07aff)](https://pypi.org/project/sql-sop/)
 
 ## Links
 - [GitHub](https://github.com/Pawansingh3889/sql-guard)
