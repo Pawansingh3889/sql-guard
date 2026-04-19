@@ -16,8 +16,10 @@ _(nothing yet)_
 
 ### Added
 - **GitHub Marketplace listing** — `action.yml` now declares `author` and
-  `branding` (icon: `check-square`, colour: `blue`), plus the previously
-  CLI-only `--include-python` surfaced as an action input. Ready to
+  `branding` (icon: `shield`, colour: `purple` — safety framing, visually
+  distinct from the `check-square`/`blue` default that most linter
+  Actions use), plus the previously CLI-only `--include-python` surfaced
+  as an action input. Ready to
   publish via the Release UI's "Publish this Action to the GitHub
   Marketplace" toggle.
 - **CLI feedback CTA** — when findings are reported, the terminal
