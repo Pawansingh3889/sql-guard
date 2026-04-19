@@ -10,6 +10,12 @@ a deprecation window (see `GOVERNANCE.md` § Scope discipline).
 
 ## [Unreleased]
 
+### Added
+- **Playground share-link.** The hosted Pyodide playground now encodes the
+  current SQL into the URL fragment (`#sql=<url-safe-base64>`) on every
+  lint, plus a "Copy link" button. Refresh or share the URL to re-open the
+  same SQL — useful for HN/Twitter/PR-review pasting.
+
 ### Fixed
 - `test_duration_tracked` no longer fails on fast hardware where
   `time.perf_counter` resolution is coarser than the scan duration.

@@ -88,16 +88,21 @@ a second after warm.
 Acceptable for a "playground" shape. Not acceptable for a CI runner -
 which is why CLI + GitHub Action remain the primary distribution.
 
+## Sharing
+
+The current SQL is encoded into the URL fragment (`#sql=<url-safe-base64>`)
+on every successful lint and on "Copy link". Refreshing or sharing the URL
+re-opens the same SQL. Encoding is UTF-8 safe and uses `history.replaceState`
+so it doesn't pollute browser history.
+
 ## Known limitations
 
 - **No file upload (yet).** Single-textarea input only. Could be added
   in ~20 lines if demand appears.
-- **No share-link.** The URL doesn't encode the pasted SQL. Could be
-  added via `#sql=<base64>` fragment.
 - **No dark/light toggle.** Dark only, matching the sql-sop terminal
   aesthetic.
 
-All three are fine first-timer PRs if someone wants to contribute.
+Both are fine first-timer PRs if someone wants to contribute.
 
 ## Maintenance
 
