@@ -45,7 +45,7 @@ class Config:
     source: Path | None = None
 
     @classmethod
-    def from_dict(cls, data: dict, source: Path | None = None) -> "Config":
+    def from_dict(cls, data: dict, source: Path | None = None) -> Config:
         contract_value = data.get("contract")
         contract_path: Path | None = None
         if contract_value:

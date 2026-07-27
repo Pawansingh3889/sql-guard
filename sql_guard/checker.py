@@ -7,13 +7,14 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from sql_guard import python_scanner
 from sql_guard.contracts import Contract
 from sql_guard.dbt import DbtProject
+from sql_guard.inline_disable import DisableMap
+from sql_guard.inline_disable import parse as parse_disables
 from sql_guard.rules import get_rules
 from sql_guard.rules.base import Finding, Rule
 from sql_guard.rules.python_rules import PYTHON_RULES
-from sql_guard import python_scanner
-from sql_guard.inline_disable import DisableMap, parse as parse_disables
 
 
 @dataclass
@@ -269,7 +270,7 @@ def check(
     ignore: list[str] | None = None,
     include_python: bool = False,
     contract: Contract | None = None,
-    dbt_project: "DbtProject | None" = None,  # noqa: F821 -- imported below
+    dbt_project: DbtProject | None = None,
 ) -> CheckResult:
     """Run all rules against discovered SQL (and optionally Python) files.
 
